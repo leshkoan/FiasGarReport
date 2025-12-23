@@ -1,0 +1,68 @@
+# Visual Studio 2022
+.vs/
+*.sln.opt
+*.suo
+*.user
+*.userosscamp
+*.booproj
+*.wrap
+*.builds
+*.pidb
+*.log
+*.scc
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+bin/
+obj/
+*.bak
+
+# Packages
+*.nupkg
+*.snupkg
+*.nuget
+nuget.exe
+packages/
+
+# Rider
+.idea/
+*.iml
+
+# dotnet tool restore
+.config/dotnet-tools.json
+
+# Temporary files
+[Tt]emp/
+*.tmp
+*.log
+*.user
+
+# Intellisense
+*.ncb
+*.aps
+*.pch
+*.idb
+*.pdb
+*.obj
+*.o
+
+# Documentation
+doc/
+
+# Resharper
+*.ReSharper*
+_ReSharper.*/
+*.DotSettings
+
+# Visual Studio Code
+.vscode/
+
+# Environment
+.env
+
+# Reports
+reports/
+
+# FiasGar specific
+gar_delta_xml.zip
