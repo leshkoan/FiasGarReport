@@ -44,7 +44,7 @@ public class GarArchiveDownloader(
         return filePath;
     }
 
-    public (string addrObjFilePath, string objectLevelsFilePath) UnpackArchive(string zipFilePath)
+    public (List<string> addrObjFilePaths, string objectLevelsFilePath) UnpackArchive(string zipFilePath)
     {
         EnsureTempDirectoryExists();
         logger.LogInformation("Распаковка архива: {ZipFilePath}...", zipFilePath);
@@ -57,19 +57,20 @@ public class GarArchiveDownloader(
         string extractPath = Path.Combine(_tempDirectory, Path.GetFileNameWithoutExtension(zipFilePath));
         
         string? objectLevelsFilePath = null;
-        string? addrObjFilePath = null;
+        List<string> addrObjFilePaths;
 
         if (Directory.Exists(extractPath))
         {
             objectLevelsFilePath = Directory.EnumerateFiles(extractPath, "AS_OBJECT_LEVELS_*.XML", SearchOption.TopDirectoryOnly)
                                             .FirstOrDefault();
-            addrObjFilePath = Directory.EnumerateFiles(extractPath, "AS_ADDR_OBJ_*.XML", SearchOption.AllDirectories)
-                                        .FirstOrDefault(f => !Path.GetFileName(f).Contains("TYPES"));
+            addrObjFilePaths = Directory.EnumerateFiles(extractPath, "AS_ADDR_OBJ_*.XML", SearchOption.AllDirectories)
+                                        .Where(f => !Path.GetFileName(f).Contains("TYPES"))
+                                        .ToList();
 
-            if (objectLevelsFilePath != null && addrObjFilePath != null)
+            if (objectLevelsFilePath != null && addrObjFilePaths.Any())
             {
                 logger.LogInformation("Архив уже распакован в: {ExtractPath}. Пропускаем распаковку.", extractPath);
-                return (addrObjFilePath, objectLevelsFilePath);
+                return (addrObjFilePaths, objectLevelsFilePath);
             }
             logger.LogInformation("Директория {ExtractPath} существует, но не содержит всех необходимых файлов. Перераспаковываем.", extractPath);
             Directory.Delete(extractPath, true);
@@ -82,10 +83,11 @@ public class GarArchiveDownloader(
 
         objectLevelsFilePath = Directory.EnumerateFiles(extractPath, "AS_OBJECT_LEVELS_*.XML", SearchOption.TopDirectoryOnly)
                                         .FirstOrDefault();
-        addrObjFilePath = Directory.EnumerateFiles(extractPath, "AS_ADDR_OBJ_*.XML", SearchOption.AllDirectories)
-                                   .FirstOrDefault(f => !Path.GetFileName(f).Contains("TYPES"));
+        addrObjFilePaths = Directory.EnumerateFiles(extractPath, "AS_ADDR_OBJ_*.XML", SearchOption.AllDirectories)
+                                   .Where(f => !Path.GetFileName(f).Contains("TYPES"))
+                                   .ToList();
 
-        if (addrObjFilePath == null)
+        if (!addrObjFilePaths.Any())
         {
             throw new FileNotFoundException("Не удалось найти файл AS_ADDR_OBJ_*.XML (исключая TYPES) в распакованном архиве (и его подпапках).");
         }
@@ -94,7 +96,7 @@ public class GarArchiveDownloader(
             throw new FileNotFoundException("Не удалось найти файл AS_OBJECT_LEVELS_*.XML в распакованном архиве (в корне).");
         }
 
-        return (addrObjFilePath, objectLevelsFilePath);
+        return (addrObjFilePaths, objectLevelsFilePath);
     }
     
     private void EnsureTempDirectoryExists()

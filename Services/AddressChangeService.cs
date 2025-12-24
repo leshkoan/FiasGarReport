@@ -11,14 +11,19 @@ public class AddressChangeService(
     IXmlParser<AddressObject> addrObjParser,
     ILogger<AddressChangeService> logger)
 {
-    public ReportModel ProcessAddressChanges(string objectLevelsFilePath, string addrObjFilePath, DownloadFileInfo downloadInfo)
+    public ReportModel ProcessAddressChanges(string objectLevelsFilePath, List<string> addrObjFilePaths, DownloadFileInfo downloadInfo)
     {
         logger.LogInformation("Обработка изменений адресных объектов...");
 
         var objectLevels = objectLevelsParser.Parse(objectLevelsFilePath);
         var objectLevelsDict = objectLevels.ToDictionary(ol => ol.LevelId);
 
-        var allAddressObjects = addrObjParser.Parse(addrObjFilePath);
+        var allAddressObjects = new List<AddressObject>();
+        foreach(var addrObjFilePath in addrObjFilePaths)
+        {
+            logger.LogInformation("Парсинг файла: {Path}", addrObjFilePath);
+            allAddressObjects.AddRange(addrObjParser.Parse(addrObjFilePath));
+        }
 
         var groupedObjects = allAddressObjects
             .Where(ao => objectLevelsDict.ContainsKey(ao.LevelId))
