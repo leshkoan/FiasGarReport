@@ -47,7 +47,7 @@ public class ReportOrchestrator(
             logger.LogInformation("Путь к файлу отчета: {Path}", finalReportPath);
             logger.LogInformation("====================================================================");
 
-            await Task.Delay(100); // Даем логгеру время на вывод последних сообщений
+            await Task.Delay(100); //Даю логгеру время на вывод последних сообщений, чтобы вопрос в консоли вывелся в конце и пользователь его увидел.
             Console.Write("Хотите открыть сгенерированный отчет? (да/нет): ");
             string? userInput = Console.ReadLine();
             var trimmedInput = userInput?.Trim();
